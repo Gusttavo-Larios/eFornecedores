@@ -7,6 +7,7 @@ import {
 } from "react-native-responsive-dimensions";
 import styled from "styled-components/native";
 import Input from "~/components/Input";
+import InputMask from "~/components/InputMask";
 import { theme } from "~/theme";
 
 export const UnForm = styled(Form)`
@@ -21,6 +22,18 @@ export const Label = styled.Text`
 `;
 
 export const InputText = styled(Input)`
+  width: 100%;
+  height: ${responsiveHeight(7)}px;
+  margin-bottom: ${responsiveWidth(4)}px;
+  padding: 0 ${responsiveWidth(2)}px;
+  background-color: ${(props) => props.theme.COLORS.WHITE_200};
+  border-radius: ${responsiveFontSize(1)}px;
+  border: ${responsiveWidth(0.3)}px solid ${(props) => props.theme.COLORS.BLACK};
+  font-family: ${(props) => props.theme.FONTS.REGULAR};
+  font-size: ${responsiveFontSize(2)}px;
+`;
+
+export const MaskedInput = styled(InputMask)`
   width: 100%;
   height: ${responsiveHeight(7)}px;
   margin-bottom: ${responsiveWidth(4)}px;

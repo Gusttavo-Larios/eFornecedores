@@ -17,6 +17,7 @@ import {
   HeadquartersColumn,
   InputText,
   Label,
+  MaskedInput,
   pickerSelectStyles,
   UnForm,
 } from "./styles";
@@ -49,19 +50,30 @@ function Register() {
           label: element.nome,
         });
       });
-      console.log(list_cities);
-      setPickerCityOptions(list_cities);
+      setPickerCityOptions(sortAlphabetically(list_cities));
     } catch (error) {
       console.log(error);
     }
   }
 
+  function sortAlphabetically(list: ListCitiesInterface[]) {
+    list.sort((a, b) => {
+      if (a.label < b.label) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+    return list;
+  }
+
   const registerSupplier: SubmitHandler<ProviderInterface> = async (data) => {
-    const supplier_data = data;
+    const supplier_data = { ...data, city: citySelect, state: stateSelect };
     const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
 
     if (form_is_valid) {
-      console.log(form_is_valid);
+      console.log(supplier_data);
     } else {
       dispatch(
         openModal({
@@ -91,8 +103,10 @@ function Register() {
         />
 
         <Label>CNPJ</Label>
-        <InputText
+        <MaskedInput
           name="cnpj_number"
+          type="cnpj"
+          keyboardType="numeric"
           autoCompleteType="off"
           autoCorrect={false}
         />
@@ -128,8 +142,13 @@ function Register() {
         <InputText name="district" autoCompleteType="off" autoCorrect={false} />
 
         <Label>CEP</Label>
-        <InputText
+        <MaskedInput
           name="cep_number"
+          type="custom"
+          options={{
+            mask: "99999-99",
+          }}
+          keyboardType="numeric"
           autoCompleteType="off"
           autoCorrect={false}
         />

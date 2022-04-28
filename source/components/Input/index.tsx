@@ -4,13 +4,21 @@ import { useField } from "@unform/core";
 
 interface InputProps extends TextInputProps {
   name: string;
+  rawText?: string;
+  onInitialData?: (text: string) => void;
 }
 
 interface InputReference extends TextInput {
   value: string;
 }
 
-export default function Input({ name, onChangeText, ...rest }: InputProps) {
+export default function Input({
+  name,
+  onChangeText,
+  rawText,
+  onInitialData,
+  ...rest
+}: InputProps) {
   const inputRef = useRef<InputReference>(null);
 
   const { fieldName, registerField, defaultValue = "" } = useField(name);
@@ -20,10 +28,16 @@ export default function Input({ name, onChangeText, ...rest }: InputProps) {
   }, [defaultValue]);
 
   useEffect(() => {
+    if (onInitialData) onInitialData(defaultValue);
+  }, [defaultValue, onInitialData]);
+
+  useEffect(() => {
     registerField<string>({
       name: fieldName,
       ref: inputRef.current,
       getValue() {
+        if (rawText) return rawText;
+
         if (inputRef.current) return inputRef.current.value;
 
         return "";
@@ -41,7 +55,7 @@ export default function Input({ name, onChangeText, ...rest }: InputProps) {
         }
       },
     });
-  }, [fieldName, registerField]);
+  }, [fieldName, rawText, registerField]);
 
   const handleChangeText = useCallback(
     (value: string) => {

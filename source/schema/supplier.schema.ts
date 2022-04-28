@@ -1,13 +1,13 @@
 import * as yup from "yup";
 
-const supplier_schema = yup.object().shape({
+let supplier_schema = yup.object().shape({
   company_name: yup.string().required(),
-  name_fantasy: yup.string().required(),
-  cnpj_number: yup.string().required().length(14),
+  fantasy_name: yup.string().required(),
+  cnpj_number: yup.string().required(),
   city: yup.string().required(),
-  country: yup.string().required(),
+  state: yup.string().required(),
   district: yup.string().required(),
-  cep_number: yup.string().required().length(9),
+  cep_number: yup.string().required(),
   street: yup.string().required(),
 });
 
