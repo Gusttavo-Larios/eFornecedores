@@ -1,5 +1,7 @@
-import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { setSupplierReference } from "~/redux/reducers/supplier.reference.slice";
 import { CnpjNumber, CompanyName, Container } from "./styles";
 
 type ProviderType = {
@@ -11,15 +13,17 @@ type ProviderType = {
   };
 };
 
-function Provider({ provider }: ProviderType) {
+function Supplier({ provider }: ProviderType) {
   const {
     item: { cnpj_number, company_name },
   } = provider;
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   function navigator(screen: string) {
-    navigation.navigate(screen, { cnpj_number });
+    dispatch(setSupplierReference({ cnpj_number }));
+    navigation.navigate(screen);
   }
 
   return (
@@ -30,4 +34,4 @@ function Provider({ provider }: ProviderType) {
   );
 }
 
-export default Provider;
+export default Supplier;

@@ -14,7 +14,7 @@ export const Label = styled.Text`
 
 export const SupplierInformation = styled.Text`
   font-family: ${(props) => props.theme.FONTS.REGULAR};
-  font-size: ${responsiveFontSize(2)};
+  font-size: ${responsiveFontSize(2)}px;
   color: ${(props) => props.theme.COLORS.BLACK};
   margin-left: ${responsiveWidth(3)}px;
   margin-bottom: ${responsiveWidth(4)}px;

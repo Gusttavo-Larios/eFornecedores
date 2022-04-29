@@ -1,11 +1,10 @@
 export default interface ProviderInterface {
-  id: string;
   company_name: string;
   fantasy_name: string;
   cnpj_number: string;
   city: string;
-  country: string;
+  state: string;
   district: string;
-  cep: string;
+  cep_number: string;
   street: string;
 }

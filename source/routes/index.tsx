@@ -6,6 +6,7 @@ import InitialScreen from "../screens/InitialScreen";
 import Home from "../screens/Home";
 import Details from "../screens/Details";
 import Register from "../screens/Register";
+import Update from "../screens/Update";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ function Routes() {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Details" component={Details} />
         <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Update" component={Update} />
       </Stack.Navigator>
     </NavigationContainer>
   );

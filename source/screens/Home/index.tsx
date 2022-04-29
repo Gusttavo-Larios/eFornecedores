@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useTheme } from "styled-components";
-import AddButton from "~/components/AddButton";
-import NoResults from "~/components/NoResults";
-import Provider from "~/components/Provider";
-import providers from "~/fakeData";
 import ListProviderInterface from "~/interfaces/list.provider.interface";
 import ProviderInterface from "~/interfaces/provider.interface";
+import AddButton from "~/components/AddButton";
+import NoResults from "~/components/NoResults";
+import Supplier from "~/components/Supplier";
+import providers from "~/fakeData";
 import Body from "../../components/Body";
 import {
   List,
@@ -53,7 +53,7 @@ function Home() {
           <List
             data={supplierList}
             renderItem={(provider: ListProviderInterface) => (
-              <Provider provider={provider} />
+              <Supplier provider={provider} />
             )}
             keyExtractor={(_, key) => key.toString()}
             ItemSeparatorComponent={() => <SeparationComponent />}

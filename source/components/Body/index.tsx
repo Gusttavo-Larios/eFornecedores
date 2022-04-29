@@ -2,7 +2,7 @@ import * as React from "react";
 import { Container } from "./styles";
 
 type BodyType = {
-  children: React.ReactNode;
+  children: JSX.Element;
 };
 
 function Body({ children }: BodyType) {

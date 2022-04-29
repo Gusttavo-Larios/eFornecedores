@@ -13,23 +13,39 @@ import {
 } from "./styles";
 import { openModal } from "~/redux/reducers/modal.slice";
 import { RootState } from "~/redux";
+import { useNavigation } from "@react-navigation/native";
+import { setSupplierData } from "~/redux/reducers/supplier.data.slice";
 
-type DetailsType = {
-  route: {
-    cnpj_number: string;
-  };
-};
-
-function Details({ route }: DetailsType) {
+function Details() {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const [currentSupplierData, setCurrentSupplierData] = React.useState({});
+
+  /**supplier está nesta tela */
+  const { cnpj_number } = useSelector(
+    (state: RootState) => state.supplierReference
+  );
   const { dialogResponse } = useSelector((state: RootState) => state.modal);
 
   React.useEffect(() => {
-    if (dialogResponse) action();
+    searchSupplier();
+  }, []);
+
+  React.useEffect(() => {
+    if (dialogResponse) excludeSupplier();
   }, [dialogResponse]);
 
-  function action() {
-    console.log("kffkfjj");
+  function searchSupplier() {
+    try {
+      console.log("axios.get");
+    } catch (error) {}
+  }
+
+  function excludeSupplier() {
+    try {
+      console.log("axios.delete");
+    } catch (error) {}
   }
 
   function openDialogModal() {
@@ -41,46 +57,53 @@ function Details({ route }: DetailsType) {
     );
   }
 
+  function navigator() {
+    dispatch(setSupplierData(currentSupplierData));
+    navigation.navigate("Update");
+  }
+
   return (
     <SubPageBody title="Fornecedor">
-      <Label>Nome Social</Label>
-      <SupplierInformation>Enterprise Limitada S.A</SupplierInformation>
+      <>
+        <Label>Nome Social</Label>
+        <SupplierInformation>Enterprise Limitada S.A</SupplierInformation>
 
-      <Label>Nome Fantasia</Label>
-      <SupplierInformation>Enterprise</SupplierInformation>
+        <Label>Nome Fantasia</Label>
+        <SupplierInformation>Enterprise</SupplierInformation>
 
-      <Label>CNPJ</Label>
-      <SupplierInformation>00.000.000/0000-00 </SupplierInformation>
+        <Label>CNPJ</Label>
+        <SupplierInformation>00.000.000/0000-00 </SupplierInformation>
 
-      <Headquarters>
-        <HeadquartersColumn>
-          <Label>Cidade</Label>
-          <SupplierInformation>São Paulo</SupplierInformation>
-        </HeadquartersColumn>
+        <Headquarters>
+          <HeadquartersColumn>
+            <Label>Cidade</Label>
+            <SupplierInformation>São Paulo</SupplierInformation>
+          </HeadquartersColumn>
 
-        <HeadquartersColumn>
-          <Label>Estado</Label>
-          <SupplierInformation>SP</SupplierInformation>
-        </HeadquartersColumn>
-      </Headquarters>
+          <HeadquartersColumn>
+            <Label>Estado</Label>
+            <SupplierInformation>SP</SupplierInformation>
+          </HeadquartersColumn>
+        </Headquarters>
 
-      <Label>Bairro</Label>
-      <SupplierInformation>Morumbi</SupplierInformation>
+        <Label>Bairro</Label>
+        <SupplierInformation>Morumbi</SupplierInformation>
 
-      <Label>CEP</Label>
-      <SupplierInformation>00000-000</SupplierInformation>
+        <Label>CEP</Label>
+        <SupplierInformation>00000-000</SupplierInformation>
 
-      <Label>Logradouro</Label>
-      <SupplierInformation>Av. Jules Rimet</SupplierInformation>
+        <Label>Logradouro</Label>
+        <SupplierInformation>Av. Jules Rimet</SupplierInformation>
 
-      <ButtonBox>
-        <ButtonUpdate>
-          <ButtonText>Atualizar</ButtonText>
-        </ButtonUpdate>
-        <ButtonDelete onPress={() => openDialogModal()}>
-          <ButtonText>Excluir</ButtonText>
-        </ButtonDelete>
-      </ButtonBox>
+        <ButtonBox>
+          <ButtonUpdate>
+            <ButtonText onPress={() => navigator()}>Atualizar</ButtonText>
+          </ButtonUpdate>
+          <ButtonDelete onPress={() => openDialogModal()}>
+            <ButtonText>Excluir</ButtonText>
+          </ButtonDelete>
+        </ButtonBox>
+      </>
     </SubPageBody>
   );
 }
