@@ -42,7 +42,7 @@ function Details() {
     } catch (error) {}
   }
 
-  function excludeSupplier() {
+  async function excludeSupplier() {
     try {
       console.log("axios.delete");
     } catch (error) {}
@@ -99,7 +99,8 @@ function Details() {
           <ButtonUpdate>
             <ButtonText onPress={() => navigator()}>Atualizar</ButtonText>
           </ButtonUpdate>
-          <ButtonDelete onPress={() => openDialogModal()}>
+          {/* <ButtonDelete onPress={() => openDialogModal()}> */}
+          <ButtonDelete onPress={() => excludeSupplier()}>
             <ButtonText>Excluir</ButtonText>
           </ButtonDelete>
         </ButtonBox>

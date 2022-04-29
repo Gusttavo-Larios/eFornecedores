@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const supplierDataSlice = createSlice({
-  name: "supplier_data",
+const supplierReferenceSlice = createSlice({
+  name: "supplier_reference",
   initialState: {
     cnpj_number: "",
   },
@@ -17,5 +17,5 @@ const supplierDataSlice = createSlice({
 });
 
 export const { clearSupplierReference, setSupplierReference } =
-  supplierDataSlice.actions;
-export default supplierDataSlice.reducer;
+  supplierReferenceSlice.actions;
+export default supplierReferenceSlice.reducer;

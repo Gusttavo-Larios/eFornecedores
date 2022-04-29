@@ -15,6 +15,8 @@ import AppLoading from "expo-app-loading";
 import { Provider } from "react-redux";
 import store from "~/redux";
 import DialogModal from "~/components/DialogModal";
+import ResultAnimation from "~/components/ResultAnimation";
+import LoadingAnimation from "~/components/LoadingAnimation";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -33,6 +35,8 @@ export default function App() {
       <Provider store={store}>
         <Routes />
         <DialogModal />
+        <ResultAnimation />
+        <LoadingAnimation />
       </Provider>
     </ThemeProvider>
   );

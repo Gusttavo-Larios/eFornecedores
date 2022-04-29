@@ -17,6 +17,9 @@ const modalSlice = createSlice({
     },
     closeModal(state) {
       state.modalIsVisible = false;
+      state.dialogResponse = false;
+      state.isDialog = false;
+      state.message = "";
     },
     answerDialog(state, { payload }) {
       const { dialogResponse } = payload;

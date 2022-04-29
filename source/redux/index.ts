@@ -1,13 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
-import modalReducer from "./reducers/modal.slice";
+import modal from "./reducers/modal.slice";
 import supplierData from "./reducers/supplier.data.slice";
 import supplierReference from "./reducers/supplier.reference.slice";
+import resultAnimation from "./reducers/result.animation.slice";
+import loading from "./reducers/loading.slice";
 
 const store = configureStore({
   reducer: {
-    modal: modalReducer,
-    supplierData: supplierData,
-    supplierReference: supplierReference,
+    modal,
+    supplierData,
+    supplierReference,
+    resultAnimation,
+    loading,
   },
 });
 
