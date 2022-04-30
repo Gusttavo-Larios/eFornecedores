@@ -22,24 +22,30 @@ import {
   pickerSelectStyles,
   UnForm,
 } from "./styles";
+import { API_URL } from "@env";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
+import { useNavigation } from "@react-navigation/native";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
 
 function Register() {
+  const { animationStart } = useResultAnimation();
   const formRef = React.useRef<FormHandles>(null);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { reload } = useRefreshScreen();
 
   const pickerStateOptions = acronyms_brazilian_states;
 
-  /**supplier está nesta tela */
-  const { cnpj_number } = useSelector(
-    (state: RootState) => state.supplierReference
-  );
   const current_supplier_data = useSelector(
-    (state: RootState) => state.supplierData
+    (state: RootState) => state.supplierDataReducer
   );
 
-  const [initialData, setInitialData] = React.useState({});
-  const [citySelect, setCitySelect] = React.useState("");
-  const [stateSelect, setStateSelect] = React.useState("");
+  const [citySelect, setCitySelect] = React.useState(
+    current_supplier_data.city
+  );
+  const [stateSelect, setStateSelect] = React.useState(
+    current_supplier_data.state
+  );
   const [pickerCityOptions, setPickerCityOptions] = React.useState<
     ListCitiesInterface[]
   >([]);
@@ -66,28 +72,42 @@ function Register() {
     }
   }
 
-  const registerSupplier: SubmitHandler<ProviderInterface> = async (data) => {
+  const updateSupplier: SubmitHandler<ProviderInterface> = async (data) => {
     try {
-      const supplier_form_data = {
-        ...data,
-        city: citySelect,
+      const { id } = current_supplier_data;
+      const supplier_form_data = Object.assign(data, {
         state: stateSelect,
-      };
+        city: citySelect,
+        id,
+      }) as ProviderInterface;
+
       const form_is_valid = await supplier_schema.isValid({
         ...supplier_form_data,
       });
 
-      if (form_is_valid && current_supplier_data !== supplier_form_data) {
-        console.log("axios.post");
+      if (form_is_valid) {
+        const respose = await axios.put(
+          `${API_URL}/update`,
+          supplier_form_data
+        );
+        if (respose.status === 200) {
+          animationStart("success");
+          reload();
+          navigation.navigate("Home" as never);
+        }
       } else {
         dispatch(
           openModal({
             message: "Preencha todos os campos corretamente",
-            isDialog: false,
           })
         );
       }
-    } catch (error) {}
+    } catch (error) {
+      animationStart(
+        "error",
+        `Não foi possivel excluir ${current_supplier_data.company_name}`
+      );
+    }
   };
 
   function sortAlphabetically(list: ListCitiesInterface[]) {
@@ -106,9 +126,9 @@ function Register() {
     <SubPageBody title="Atualizar">
       <>
         <UnForm
-          initialData={initialData}
+          initialData={current_supplier_data}
           ref={formRef}
-          onSubmit={registerSupplier}
+          onSubmit={updateSupplier}
         >
           <Label>Nome Social</Label>
           <InputText
@@ -170,10 +190,7 @@ function Register() {
           <Label>CEP</Label>
           <MaskedInput
             name="cep_number"
-            type="custom"
-            options={{
-              mask: "99999-99",
-            }}
+            type="zip-code"
             keyboardType="numeric"
             autoCompleteType="off"
             autoCorrect={false}
@@ -184,7 +201,7 @@ function Register() {
 
           <ConfirmationButton
             activeOpacity={0.8}
-            onPress={() => formRef.current.submitForm()}
+            onPress={() => formRef.current?.submitForm()}
           >
             <ButtonText>Confirmar</ButtonText>
           </ConfirmationButton>

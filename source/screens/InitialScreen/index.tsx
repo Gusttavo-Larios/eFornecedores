@@ -7,7 +7,7 @@ function InitialScreen() {
   const navigation = useNavigation();
 
   function navigator(screen: string) {
-    navigation.navigate(screen);
+    navigation.navigate(screen as never);
   }
 
   return (

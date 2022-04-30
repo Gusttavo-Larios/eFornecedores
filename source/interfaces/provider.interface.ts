@@ -1,4 +1,5 @@
 export default interface ProviderInterface {
+  id: number;
   company_name: string;
   fantasy_name: string;
   cnpj_number: string;

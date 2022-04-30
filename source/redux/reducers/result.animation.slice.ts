@@ -9,7 +9,6 @@ const resultAnimationSlice = createSlice({
   reducers: {
     activateAnimation(current_state, { payload }) {
       const { type, message } = payload;
-      console.log(payload);
       current_state.type = type;
       current_state.message = message;
     },

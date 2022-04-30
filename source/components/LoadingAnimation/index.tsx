@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "~/redux";
 
 function LoadingAnimation() {
-  const { isLoading } = useSelector((state: RootState) => state.loading);
+  const { isLoading } = useSelector((state: RootState) => state.loadingReducer);
   return (
     <>
       {isLoading && (

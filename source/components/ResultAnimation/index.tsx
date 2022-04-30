@@ -9,7 +9,7 @@ import { useResultAnimation } from "~/hooks/useResultAanimation";
 function ResultAnimation() {
   const { animationEnding } = useResultAnimation();
   const { message, type } = useSelector(
-    (state: RootState) => state.resultAnimation
+    (state: RootState) => state.resultAnimationReducer
   );
 
   setTimeout(() => animationEnding(), 4000);
@@ -35,7 +35,7 @@ function ResultAnimation() {
             }}
             loop
           />
-          <Message>{message}</Message>
+          {message !== "" && <Message>{message}</Message>}
         </Container>
       )}
     </>

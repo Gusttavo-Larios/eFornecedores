@@ -3,15 +3,15 @@ import { createSlice } from "@reduxjs/toolkit";
 const supplierReferenceSlice = createSlice({
   name: "supplier_reference",
   initialState: {
-    cnpj_number: "",
+    reference_number_cnpj: "",
   },
   reducers: {
     setSupplierReference(current_state, { payload }) {
       const { cnpj_number } = payload;
-      current_state.cnpj_number = cnpj_number;
+      current_state.reference_number_cnpj = cnpj_number;
     },
     clearSupplierReference(current_state) {
-      current_state.cnpj_number = "";
+      current_state.reference_number_cnpj = "";
     },
   },
 });

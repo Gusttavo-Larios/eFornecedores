@@ -8,7 +8,7 @@ import {
 export const useResultAnimation = () => {
   const dispatch = useDispatch();
 
-  function animationStart(type: string, message: string) {
+  function animationStart(type: string, message?: string) {
     dispatch(activateAnimation({ type, message }));
   }
 

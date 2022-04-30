@@ -1,3 +1,5 @@
+import { API_URL } from "@env";
+import { useNavigation } from "@react-navigation/native";
 import { FormHandles, SubmitHandler } from "@unform/core";
 import axios from "axios";
 import * as React from "react";
@@ -5,6 +7,8 @@ import Picker from "react-native-picker-select";
 import { useDispatch } from "react-redux";
 import SubPageBody from "~/components/SubPageBody";
 import acronyms_brazilian_states from "~/data/acronyms.brazilian.states";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
 import ListCitiesInterface from "~/interfaces/list.citites.interface";
 import ProviderInterface from "~/interfaces/provider.interface";
 import RequestCitiesInterface from "~/interfaces/request.cities.interface";
@@ -25,8 +29,11 @@ import {
 function Register() {
   const pickerStateOptions = acronyms_brazilian_states;
 
+  const { animationStart } = useResultAnimation();
   const formRef = React.useRef<FormHandles>(null);
+  const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { reload } = useRefreshScreen();
 
   const [citySelect, setCitySelect] = React.useState("");
   const [stateSelect, setStateSelect] = React.useState("");
@@ -69,18 +76,32 @@ function Register() {
   }
 
   const registerSupplier: SubmitHandler<ProviderInterface> = async (data) => {
-    const supplier_data = { ...data, city: citySelect, state: stateSelect };
-    const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
+    try {
+      const supplier_data = { ...data, city: citySelect, state: stateSelect };
+      const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
 
-    if (form_is_valid) {
-      console.log(supplier_data);
-    } else {
-      dispatch(
-        openModal({
-          message:
-            "Preencha todos os campos corretamente para cadastrar um novo fornencedor",
-          isDialog: false,
-        })
+      if (form_is_valid) {
+        console.log(supplier_data);
+        const response = await axios.post(`${API_URL}/register`, supplier_data);
+
+        if (response.status === 200) {
+          animationStart("success");
+          reload();
+          navigation.goBack();
+        }
+      } else {
+        dispatch(
+          openModal({
+            message:
+              "Preencha todos os campos corretamente para cadastrar um novo fornencedor",
+            isDialog: false,
+          })
+        );
+      }
+    } catch (error) {
+      animationStart(
+        "error",
+        "Não foi possivel realizar o cadastro do fornecedor"
       );
     }
   };
@@ -149,10 +170,7 @@ function Register() {
           <Label>CEP</Label>
           <MaskedInput
             name="cep_number"
-            type="custom"
-            options={{
-              mask: "99999-99",
-            }}
+            type="zip-code"
             keyboardType="numeric"
             autoCompleteType="off"
             autoCorrect={false}
@@ -163,7 +181,7 @@ function Register() {
 
           <ConfirmationButton
             activeOpacity={0.8}
-            onPress={() => formRef.current.submitForm()}
+            onPress={() => formRef.current?.submitForm()}
           >
             <ButtonText>Cadastrar</ButtonText>
           </ConfirmationButton>
