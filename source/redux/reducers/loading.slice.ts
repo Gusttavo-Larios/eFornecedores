@@ -6,11 +6,11 @@ const loading = createSlice({
     isLoading: false,
   },
   reducers: {
-    activateLoading(current_state) {
-      current_state.isLoading = true;
+    activateLoading(currentState) {
+      currentState.isLoading = true;
     },
-    disableLoading(current_state) {
-      current_state.isLoading = false;
+    disableLoading(currentState) {
+      currentState.isLoading = false;
     },
   },
 });

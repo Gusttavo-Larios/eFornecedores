@@ -14,7 +14,7 @@ const supplierDataSlice = createSlice({
     street: "",
   },
   reducers: {
-    setSupplierData(current_state, { payload }) {
+    setSupplierData(currentState, { payload }) {
       const {
         id,
         company_name,
@@ -26,33 +26,33 @@ const supplierDataSlice = createSlice({
         cep_number,
         street,
       } = payload;
-      current_state.id = id;
-      current_state.cnpj_number = cnpj_number;
-      current_state.cep_number = cep_number;
-      current_state.city = city;
-      current_state.company_name = company_name;
-      current_state.fantasy_name = fantasy_name;
-      current_state.state = state;
-      current_state.district = district;
-      current_state.street = street;
+      currentState.id = id;
+      currentState.cnpj_number = cnpj_number;
+      currentState.cep_number = cep_number;
+      currentState.city = city;
+      currentState.company_name = company_name;
+      currentState.fantasy_name = fantasy_name;
+      currentState.state = state;
+      currentState.district = district;
+      currentState.street = street;
     },
-    clearSupplierData(current_state) {
-      current_state.id = 0;
-      current_state.cnpj_number = "";
-      current_state.cep_number = "";
-      current_state.city = "";
-      current_state.company_name = "";
-      current_state.fantasy_name = "";
-      current_state.state = "";
-      current_state.district = "";
-      current_state.street = "";
+    clearSupplierData(currentState) {
+      currentState.id = 0;
+      currentState.cnpj_number = "";
+      currentState.cep_number = "";
+      currentState.city = "";
+      currentState.company_name = "";
+      currentState.fantasy_name = "";
+      currentState.state = "";
+      currentState.district = "";
+      currentState.street = "";
     },
-    setSupplierReference(current_state, { payload }) {
+    setSupplierReference(currentState, { payload }) {
       const { cnpj_number } = payload;
-      current_state.cnpj_number = cnpj_number;
+      currentState.cnpj_number = cnpj_number;
     },
-    clearSupplierReference(current_state) {
-      current_state.cnpj_number = "";
+    clearSupplierReference(currentState) {
+      currentState.cnpj_number = "";
     },
   },
 });

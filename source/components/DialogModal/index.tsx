@@ -1,19 +1,18 @@
 import * as React from "react";
+import Modal from "react-native-modal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "~/redux";
-import { closeModal } from "~/redux/reducers/modal.slice";
+import { closeDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import { ButtonText, Button, Container, Message, Overlap } from "./styles";
-
-import Modal from "react-native-modal";
 
 function DialogModal() {
   const { modalIsVisible, message } = useSelector(
-    (state: RootState) => state.modalReducer
+    (state: RootState) => state.modalDialogReducer
   );
   const dispatch = useDispatch();
 
-  function closeDialogModal() {
-    dispatch(closeModal());
+  function closeDialoggdal() {
+    dispatch(closeDialogModal());
   }
 
   return (
@@ -21,7 +20,7 @@ function DialogModal() {
       <Overlap>
         <Container>
           <Message>{message}</Message>
-          <Button activeOpacity={0.8} onPress={() => closeDialogModal()}>
+          <Button activeOpacity={0.8} onPress={() => closeDialoggdal()}>
             <ButtonText>Ok</ButtonText>
           </Button>
         </Container>

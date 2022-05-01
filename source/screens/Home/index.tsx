@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ListRenderItemInfo } from "react-native";
 import { useTheme } from "styled-components";
+import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { API_URL } from "@env";
@@ -21,6 +22,7 @@ import {
 } from "./styles";
 
 function Home() {
+  const navigation = useNavigation();
   const { startLoading, finishLoading } = useLoading();
   const { animationStart } = useResultAnimation();
   const theme = useTheme();
@@ -71,6 +73,7 @@ function Home() {
         "error",
         "Algum erro inesperado ocorreu, tente novamente mais tarde"
       );
+      navigation.goBack();
     }
   }
 

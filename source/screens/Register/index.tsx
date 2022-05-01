@@ -10,7 +10,7 @@ import RequestCitiesInterface from "~/interfaces/request.cities.interface";
 import ListCitiesInterface from "~/interfaces/list.citites.interface";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import SubPageBody from "~/components/SubPageBody";
-import { openModal } from "~/redux/reducers/modal.slice";
+import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import supplier_schema from "~/schema/supplier.schema";
 import useRefreshScreen from "~/hooks/useRefreshScreen";
 import { useResultAnimation } from "~/hooks/useResultAanimation";
@@ -42,7 +42,7 @@ function Register() {
   >([]);
 
   React.useEffect(() => {
-    searchCitites();
+    if (stateSelect !== "") searchCitites();
   }, [stateSelect]);
 
   async function searchCitites() {
@@ -51,15 +51,20 @@ function Register() {
         `https://brasilapi.com.br/api/ibge/municipios/v1/${stateSelect}`
       );
       let list_cities: ListCitiesInterface[] = [];
-      data.forEach((element: RequestCitiesInterface) => {
+      data.map((element: RequestCitiesInterface, key: number) => {
         list_cities.push({
+          key,
           value: element.nome,
           label: element.nome,
         });
       });
       setPickerCityOptions(sortAlphabetically(list_cities));
     } catch (error) {
-      console.log(error);
+      animationStart(
+        "error",
+        "Algum erro inesperado ocorreu, tente novamente mais tarde"
+      );
+      navigation.goBack();
     }
   }
 
@@ -81,7 +86,6 @@ function Register() {
       const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
 
       if (form_is_valid) {
-        console.log(supplier_data);
         const response = await axios.post(`${API_URL}/register`, supplier_data);
 
         if (response.status === 200) {
@@ -91,7 +95,7 @@ function Register() {
         }
       } else {
         dispatch(
-          openModal({
+          openDialogModal({
             message:
               "Preencha todos os campos corretamente para cadastrar um novo fornencedor",
             isDialog: false,
@@ -137,8 +141,9 @@ function Register() {
             <HeadquartersColumn>
               <Label>Estado</Label>
               <RNPickerSelect
-                placeholder={{ value: "", label: "" }}
-                value={stateSelect}
+                placeholder={{ value: " ", label: " " }}
+                // placeholder={{}}
+                value={stateSelect === "" ? "" : stateSelect}
                 onValueChange={(district) => setStateSelect(district)}
                 items={pickerStateOptions}
                 style={pickerSelectStyles}
@@ -149,7 +154,7 @@ function Register() {
             <HeadquartersColumn>
               <Label>Cidade</Label>
               <RNPickerSelect
-                placeholder={{ value: "", label: "" }}
+                placeholder={{}}
                 value={citySelect}
                 onValueChange={(city) => setCitySelect(city)}
                 disabled={citySelect === "" ? true : false}

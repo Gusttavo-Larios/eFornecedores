@@ -11,7 +11,7 @@ import InputMask from "~/components/InputMask";
 import { theme } from "~/theme";
 
 export const UnForm = styled(Form)`
-  padding-bottom: ${responsiveHeight(7)}px;
+  padding-bottom: ${responsiveHeight(20)}px;
 `;
 
 export const Label = styled.Text`

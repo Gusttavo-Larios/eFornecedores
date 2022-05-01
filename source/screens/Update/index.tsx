@@ -10,7 +10,7 @@ import ListCitiesInterface from "~/interfaces/list.citites.interface";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import RequestCitiesInterface from "~/interfaces/request.cities.interface";
 import { RootState } from "~/redux";
-import { openModal } from "~/redux/reducers/modal.slice";
+import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import {
   ButtonText,
   ConfirmationButton,
@@ -60,8 +60,9 @@ function Register() {
         `https://brasilapi.com.br/api/ibge/municipios/v1/${stateSelect}`
       );
       let list_cities: ListCitiesInterface[] = [];
-      data.forEach((element: RequestCitiesInterface) => {
+      data.map((element: RequestCitiesInterface, key: number) => {
         list_cities.push({
+          key,
           value: element.nome,
           label: element.nome,
         });
@@ -97,7 +98,7 @@ function Register() {
         }
       } else {
         dispatch(
-          openModal({
+          openDialogModal({
             message: "Preencha todos os campos corretamente",
           })
         );

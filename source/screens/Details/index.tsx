@@ -43,7 +43,7 @@ function Details() {
   async function searchSupplier() {
     try {
       const response = await axios.get(
-        `${API_URL}/search-supplier?cnpj_number=${reference_number_cnpj}`
+        `${API_URL}/search-supplier?cnpj_number=${cnpj_number}`
       );
       const supplier: SupplierInterface = response.data.supplier[0];
       setCurrentSupplierData(supplier);
@@ -53,6 +53,7 @@ function Details() {
         "error",
         "Houve algum problema, tente novamente mais tarde"
       );
+      navigation.goBack();
     }
   }
 
@@ -71,6 +72,7 @@ function Details() {
         "error",
         `Não foi possivel excluir ${currentSupplierData.company_name}`
       );
+      navigation.goBack();
     }
   }
 

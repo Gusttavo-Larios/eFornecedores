@@ -6,8 +6,8 @@ const homeSlice = createSlice({
     refresh_screen: false,
   },
   reducers: {
-    refreshScrenn(state) {
-      state.refresh_screen = !state.refresh_screen;
+    refreshScrenn(currentState) {
+      currentState.refresh_screen = !currentState.refresh_screen;
     },
   },
 });

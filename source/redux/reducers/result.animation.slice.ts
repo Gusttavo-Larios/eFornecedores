@@ -7,14 +7,14 @@ const resultAnimationSlice = createSlice({
     message: "",
   },
   reducers: {
-    activateAnimation(current_state, { payload }) {
+    activateAnimation(currentState, { payload }) {
       const { type, message } = payload;
-      current_state.type = type;
-      current_state.message = message;
+      currentState.type = type;
+      currentState.message = message;
     },
-    endAnimation(current_state) {
-      current_state.type = "";
-      current_state.message = "";
+    endAnimation(currentState) {
+      currentState.type = "";
+      currentState.message = "";
     },
   },
 });
