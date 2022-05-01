@@ -1,9 +1,9 @@
 import * as React from "react";
+import { useSelector } from "react-redux";
 import LottieView from "lottie-react-native";
 import { responsiveWidth } from "react-native-responsive-dimensions";
-import { Container } from "./styles";
-import { useSelector } from "react-redux";
 import { RootState } from "~/redux";
+import { Container } from "./styles";
 
 function LoadingAnimation() {
   const { isLoading } = useSelector((state: RootState) => state.loadingReducer);

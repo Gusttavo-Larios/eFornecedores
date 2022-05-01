@@ -1,19 +1,19 @@
-import { API_URL } from "@env";
-import { useNavigation } from "@react-navigation/native";
-import { FormHandles, SubmitHandler } from "@unform/core";
-import axios from "axios";
 import * as React from "react";
-import Picker from "react-native-picker-select";
+import { FormHandles, SubmitHandler } from "@unform/core";
+import { useNavigation } from "@react-navigation/native";
+import RNPickerSelect from "react-native-picker-select";
+import axios from "axios";
 import { useDispatch } from "react-redux";
-import SubPageBody from "~/components/SubPageBody";
+import { API_URL } from "@env";
 import acronyms_brazilian_states from "~/data/acronyms.brazilian.states";
-import useRefreshScreen from "~/hooks/useRefreshScreen";
-import { useResultAnimation } from "~/hooks/useResultAanimation";
-import ListCitiesInterface from "~/interfaces/list.citites.interface";
-import ProviderInterface from "~/interfaces/provider.interface";
 import RequestCitiesInterface from "~/interfaces/request.cities.interface";
+import ListCitiesInterface from "~/interfaces/list.citites.interface";
+import SupplierInterface from "~/interfaces/supplier.interface";
+import SubPageBody from "~/components/SubPageBody";
 import { openModal } from "~/redux/reducers/modal.slice";
 import supplier_schema from "~/schema/supplier.schema";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
 import {
   ButtonText,
   ConfirmationButton,
@@ -75,7 +75,7 @@ function Register() {
     return list;
   }
 
-  const registerSupplier: SubmitHandler<ProviderInterface> = async (data) => {
+  const registerSupplier: SubmitHandler<SupplierInterface> = async (data) => {
     try {
       const supplier_data = { ...data, city: citySelect, state: stateSelect };
       const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
@@ -136,8 +136,8 @@ function Register() {
           <Headquarters>
             <HeadquartersColumn>
               <Label>Estado</Label>
-              <Picker
-                placeholder="Selecione"
+              <RNPickerSelect
+                placeholder={{ value: "", label: "" }}
                 value={stateSelect}
                 onValueChange={(district) => setStateSelect(district)}
                 items={pickerStateOptions}
@@ -148,8 +148,8 @@ function Register() {
 
             <HeadquartersColumn>
               <Label>Cidade</Label>
-              <Picker
-                placeholder="Selecione"
+              <RNPickerSelect
+                placeholder={{ value: "", label: "" }}
                 value={citySelect}
                 onValueChange={(city) => setCitySelect(city)}
                 disabled={citySelect === "" ? true : false}

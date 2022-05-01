@@ -1,16 +1,16 @@
 import * as React from "react";
 import { FormHandles, SubmitHandler } from "@unform/core";
 import axios from "axios";
-import Picker from "react-native-picker-select";
+import RNPickerSelect from "react-native-picker-select";
 import { useDispatch, useSelector } from "react-redux";
 import SubPageBody from "~/components/SubPageBody";
 import acronyms_brazilian_states from "~/data/acronyms.brazilian.states";
+import supplier_schema from "~/schema/supplier.schema";
 import ListCitiesInterface from "~/interfaces/list.citites.interface";
-import ProviderInterface from "~/interfaces/provider.interface";
+import SupplierInterface from "~/interfaces/supplier.interface";
 import RequestCitiesInterface from "~/interfaces/request.cities.interface";
 import { RootState } from "~/redux";
 import { openModal } from "~/redux/reducers/modal.slice";
-import supplier_schema from "~/schema/supplier.schema";
 import {
   ButtonText,
   ConfirmationButton,
@@ -37,7 +37,7 @@ function Register() {
   const pickerStateOptions = acronyms_brazilian_states;
 
   const current_supplier_data = useSelector(
-    (state: RootState) => state.supplierDataReducer
+    (state: RootState) => state.supplierReducer
   );
 
   const [citySelect, setCitySelect] = React.useState(
@@ -72,14 +72,14 @@ function Register() {
     }
   }
 
-  const updateSupplier: SubmitHandler<ProviderInterface> = async (data) => {
+  const updateSupplier: SubmitHandler<SupplierInterface> = async (data) => {
     try {
       const { id } = current_supplier_data;
       const supplier_form_data = Object.assign(data, {
         state: stateSelect,
         city: citySelect,
         id,
-      }) as ProviderInterface;
+      }) as SupplierInterface;
 
       const form_is_valid = await supplier_schema.isValid({
         ...supplier_form_data,
@@ -156,8 +156,8 @@ function Register() {
           <Headquarters>
             <HeadquartersColumn>
               <Label>Estado</Label>
-              <Picker
-                placeholder="Selecione"
+              <RNPickerSelect
+                placeholder={{ value: "", label: "Selecione" }}
                 value={stateSelect}
                 onValueChange={(district) => setStateSelect(district)}
                 items={pickerStateOptions}
@@ -168,8 +168,8 @@ function Register() {
 
             <HeadquartersColumn>
               <Label>Cidade</Label>
-              <Picker
-                placeholder="Selecione"
+              <RNPickerSelect
+                placeholder={{ value: "", label: "Selecione" }}
                 value={citySelect}
                 onValueChange={(city) => setCitySelect(city)}
                 disabled={citySelect === "" ? true : false}

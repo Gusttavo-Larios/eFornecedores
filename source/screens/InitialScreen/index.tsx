@@ -12,11 +12,13 @@ function InitialScreen() {
 
   return (
     <Body>
-      <Logo>eFornecedor</Logo>
+      <>
+        <Logo>eFornecedor</Logo>
 
-      <EnterButton activeOpacity={0.8} onPress={() => navigator("Home")}>
-        <TextEnterButton>Entrar</TextEnterButton>
-      </EnterButton>
+        <EnterButton activeOpacity={0.8} onPress={() => navigator("Home")}>
+          <TextEnterButton>Entrar</TextEnterButton>
+        </EnterButton>
+      </>
     </Body>
   );
 }

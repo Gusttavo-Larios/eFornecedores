@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { number } from "yup";
 
 const supplierDataSlice = createSlice({
-  name: "supplier_data",
+  name: "supplier",
   initialState: {
     id: 0,
     company_name: "",
@@ -48,8 +47,20 @@ const supplierDataSlice = createSlice({
       current_state.district = "";
       current_state.street = "";
     },
+    setSupplierReference(current_state, { payload }) {
+      const { cnpj_number } = payload;
+      current_state.cnpj_number = cnpj_number;
+    },
+    clearSupplierReference(current_state) {
+      current_state.cnpj_number = "";
+    },
   },
 });
 
-export const { setSupplierData, clearSupplierData } = supplierDataSlice.actions;
+export const {
+  setSupplierData,
+  clearSupplierData,
+  clearSupplierReference,
+  setSupplierReference,
+} = supplierDataSlice.actions;
 export default supplierDataSlice.reducer;

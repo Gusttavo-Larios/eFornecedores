@@ -1,12 +1,17 @@
 import * as React from "react";
+import { ListRenderItemInfo } from "react-native";
 import { useTheme } from "styled-components";
+import { useSelector } from "react-redux";
+import axios from "axios";
 import { API_URL } from "@env";
-import ListProviderInterface from "~/interfaces/list.provider.interface";
-import ProviderInterface from "~/interfaces/provider.interface";
+import SupplierInterface from "~/interfaces/supplier.interface";
+import Body from "~/components/Body";
+import Supplier from "~/components/Supplier";
 import AddButton from "~/components/AddButton";
 import NoResults from "~/components/NoResults";
-import Supplier from "~/components/Supplier";
-import Body from "../../components/Body";
+import { useLoading } from "~/hooks/useLoading";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
+import { RootState } from "~/redux";
 import {
   List,
   ListFooter,
@@ -14,11 +19,6 @@ import {
   SupplierFilter,
   Title,
 } from "./styles";
-import axios from "axios";
-import { useLoading } from "~/hooks/useLoading";
-import { useResultAnimation } from "~/hooks/useResultAanimation";
-import { useSelector } from "react-redux";
-import { RootState } from "~/redux";
 
 function Home() {
   const { startLoading, finishLoading } = useLoading();
@@ -28,11 +28,11 @@ function Home() {
     (state: RootState) => state.homeReducer
   );
 
-  const [allSuppliers, setAllSuppliers] = React.useState<ProviderInterface[]>(
+  const [allSuppliers, setAllSuppliers] = React.useState<SupplierInterface[]>(
     []
   );
   const [supplierList, setSupplierList] =
-    React.useState<ProviderInterface[]>(allSuppliers);
+    React.useState<SupplierInterface[]>(allSuppliers);
   const [supplierFilter, setSupplierFilter] = React.useState("");
 
   React.useEffect(() => {
@@ -53,14 +53,16 @@ function Home() {
           .toLowerCase()
           .includes(supplierFilter.toLowerCase())
       );
-      setSupplierList(filtered_suppliers);
+      setSupplierList(
+        filtered_suppliers.length > 0 ? filtered_suppliers : allSuppliers
+      );
     }
   }
 
   async function searchAllSuppliers() {
     try {
       const response = await axios.get(`${API_URL}/`);
-      const suppliers: ProviderInterface[] = response.data.allSuppliers;
+      const suppliers: SupplierInterface[] = response.data.allSuppliers;
       setAllSuppliers(suppliers);
       setSupplierList(suppliers);
       finishLoading();
@@ -72,33 +74,38 @@ function Home() {
     }
   }
 
+  function renderItem({ item }: ListRenderItemInfo<SupplierInterface>) {
+    return <Supplier provider={item} />;
+  }
+
   return (
     <Body>
-      <Title>Fornecedores</Title>
-      {supplierList.length > 0 ? (
-        <>
-          <SupplierFilter
-            placeholder="Filtre pelo Nome Social"
-            placeholderTextColor={theme.COLORS.BLACK}
-            autoCompleteType="off"
-            autoCorrect={false}
-            onChangeText={(fantasy_name) => setSupplierFilter(fantasy_name)}
-          />
-          <List
-            data={supplierList}
-            renderItem={(provider: ListProviderInterface) => (
-              <Supplier provider={provider} />
-            )}
-            keyExtractor={(_, key) => key.toString()}
-            ItemSeparatorComponent={() => <SeparationComponent />}
-            ListFooterComponent={<ListFooter />}
-            showsVerticalScrollIndicator={false}
-          />
-        </>
-      ) : (
-        <NoResults />
-      )}
-      <AddButton />
+      <>
+        <Title>Fornecedores</Title>
+        {supplierList.length > 0 ? (
+          <>
+            <SupplierFilter
+              placeholder="Filtre pelo Nome Social"
+              placeholderTextColor={theme.COLORS.BLACK}
+              autoCompleteType="off"
+              autoCorrect={false}
+              value={supplierFilter}
+              onChangeText={(fantasy_name) => setSupplierFilter(fantasy_name)}
+            />
+            <List
+              data={supplierList}
+              renderItem={renderItem}
+              keyExtractor={(item, key) => key.toString()}
+              ItemSeparatorComponent={() => <SeparationComponent />}
+              ListFooterComponent={<ListFooter />}
+              showsVerticalScrollIndicator={false}
+            />
+          </>
+        ) : (
+          <NoResults />
+        )}
+        <AddButton />
+      </>
     </Body>
   );
 }

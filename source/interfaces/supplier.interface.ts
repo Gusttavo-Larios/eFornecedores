@@ -1,4 +1,4 @@
-export default interface ProviderInterface {
+export default interface SupplierInterface {
   id: number;
   company_name: string;
   fantasy_name: string;

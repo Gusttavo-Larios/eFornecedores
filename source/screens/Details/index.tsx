@@ -1,14 +1,15 @@
 import * as React from "react";
-import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 import { API_URL } from "@env";
 import SubPageBody from "~/components/SubPageBody";
+import SupplierInterface from "~/interfaces/supplier.interface";
 import { RootState } from "~/redux";
-import ProviderInterface from "~/interfaces/provider.interface";
-import { useResultAnimation } from "~/hooks/useResultAanimation";
+import { setSupplierData } from "~/redux/reducers/supplier.slice";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
 import { useLoading } from "~/hooks/useLoading";
-import { setSupplierData } from "~/redux/reducers/supplier.data.slice";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
 import {
   ButtonBox,
   ButtonDelete,
@@ -19,7 +20,6 @@ import {
   Label,
   SupplierInformation,
 } from "./styles";
-import useRefreshScreen from "~/hooks/useRefreshScreen";
 
 function Details() {
   const navigation = useNavigation();
@@ -29,10 +29,10 @@ function Details() {
   const { reload } = useRefreshScreen();
 
   const [currentSupplierData, setCurrentSupplierData] =
-    React.useState<ProviderInterface>({} as ProviderInterface);
+    React.useState<SupplierInterface>({} as SupplierInterface);
 
-  const { reference_number_cnpj } = useSelector(
-    (state: RootState) => state.supplierReferenceReducer
+  const { cnpj_number } = useSelector(
+    (state: RootState) => state.supplierReducer
   );
 
   React.useEffect(() => {
@@ -45,7 +45,7 @@ function Details() {
       const response = await axios.get(
         `${API_URL}/search-supplier?cnpj_number=${reference_number_cnpj}`
       );
-      const supplier: ProviderInterface = response.data.supplier[0];
+      const supplier: SupplierInterface = response.data.supplier[0];
       setCurrentSupplierData(supplier);
       finishLoading();
     } catch (error) {

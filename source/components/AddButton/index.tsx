@@ -9,7 +9,7 @@ function AddButton() {
   return (
     <Container
       activeOpacity={0.7}
-      onPress={() => navigation.navigate("Register")}
+      onPress={() => navigation.navigate("Register" as never)}
     >
       <Ionicons name="add-sharp" size={responsiveFontSize(7)} color="white" />
     </Container>

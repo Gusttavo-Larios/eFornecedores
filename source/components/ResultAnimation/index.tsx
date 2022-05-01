@@ -1,10 +1,10 @@
 import * as React from "react";
-import LottieView from "lottie-react-native";
 import { useSelector } from "react-redux";
-import { RootState } from "~/redux";
+import LottieView from "lottie-react-native";
 import { responsiveWidth } from "react-native-responsive-dimensions";
-import { Container, Message } from "./styles";
+import { RootState } from "~/redux";
 import { useResultAnimation } from "~/hooks/useResultAanimation";
+import { Container, Message } from "./styles";
 
 function ResultAnimation() {
   const { animationEnding } = useResultAnimation();
