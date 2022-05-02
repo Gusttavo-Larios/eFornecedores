@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { API_URL } from "@env";
+import { cnpjMask, zipCodeMask } from "~/functions/masks";
 import SubPageBody from "~/components/SubPageBody";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import { RootState } from "~/redux";
@@ -24,19 +25,20 @@ import {
 function Details() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { startLoading, finishLoading } = useLoading();
+  const { finishLoading } = useLoading();
   const { animationStart } = useResultAnimation();
   const { reload } = useRefreshScreen();
 
-  const [currentSupplierData, setCurrentSupplierData] =
-    React.useState<SupplierInterface>({} as SupplierInterface);
+  const { isLoading } = useSelector((state: RootState) => state.loadingReducer);
 
   const { cnpj_number } = useSelector(
     (state: RootState) => state.supplierReducer
   );
 
+  const [currentSupplierData, setCurrentSupplierData] =
+    React.useState<SupplierInterface>({} as SupplierInterface);
+
   React.useEffect(() => {
-    startLoading();
     searchSupplier();
   }, []);
 
@@ -82,62 +84,68 @@ function Details() {
   }
 
   return (
-    <SubPageBody title="Fornecedor">
-      <>
-        <Label>Nome Social</Label>
-        <SupplierInformation>
-          {currentSupplierData.company_name}
-        </SupplierInformation>
-
-        <Label>Nome Fantasia</Label>
-        <SupplierInformation>
-          {currentSupplierData.fantasy_name}
-        </SupplierInformation>
-
-        <Label>CNPJ</Label>
-        <SupplierInformation>
-          {currentSupplierData.cnpj_number}
-        </SupplierInformation>
-
-        <Headquarters>
-          <HeadquartersColumn>
-            <Label>Estado</Label>
+    <>
+      {!isLoading && (
+        <SubPageBody title="Fornecedor">
+          <>
+            <Label>Nome Social</Label>
             <SupplierInformation>
-              {currentSupplierData.state}
+              {currentSupplierData.company_name}
             </SupplierInformation>
-          </HeadquartersColumn>
 
-          <HeadquartersColumn>
-            <Label>Cidade</Label>
+            <Label>Nome Fantasia</Label>
             <SupplierInformation>
-              {currentSupplierData.city}
+              {currentSupplierData.fantasy_name}
             </SupplierInformation>
-          </HeadquartersColumn>
-        </Headquarters>
 
-        <Label>Bairro</Label>
-        <SupplierInformation>
-          {currentSupplierData.district}
-        </SupplierInformation>
+            <Label>CNPJ</Label>
+            <SupplierInformation>
+              {cnpjMask(currentSupplierData.cnpj_number)}
+            </SupplierInformation>
 
-        <Label>CEP</Label>
-        <SupplierInformation>
-          {currentSupplierData.cep_number}
-        </SupplierInformation>
+            <Headquarters>
+              <HeadquartersColumn>
+                <Label>Estado</Label>
+                <SupplierInformation>
+                  {currentSupplierData.state}
+                </SupplierInformation>
+              </HeadquartersColumn>
 
-        <Label>Logradouro</Label>
-        <SupplierInformation>{currentSupplierData.street}</SupplierInformation>
+              <HeadquartersColumn>
+                <Label>Cidade</Label>
+                <SupplierInformation>
+                  {currentSupplierData.city}
+                </SupplierInformation>
+              </HeadquartersColumn>
+            </Headquarters>
 
-        <ButtonBox>
-          <ButtonUpdate>
-            <ButtonText onPress={() => navigator()}>Atualizar</ButtonText>
-          </ButtonUpdate>
-          <ButtonDelete onPress={() => excludeSupplier()}>
-            <ButtonText>Excluir</ButtonText>
-          </ButtonDelete>
-        </ButtonBox>
-      </>
-    </SubPageBody>
+            <Label>Bairro</Label>
+            <SupplierInformation>
+              {currentSupplierData.district}
+            </SupplierInformation>
+
+            <Label>CEP</Label>
+            <SupplierInformation>
+              {zipCodeMask(currentSupplierData.cep_number)}
+            </SupplierInformation>
+
+            <Label>Logradouro</Label>
+            <SupplierInformation>
+              {currentSupplierData.street}
+            </SupplierInformation>
+
+            <ButtonBox>
+              <ButtonUpdate>
+                <ButtonText onPress={() => navigator()}>Atualizar</ButtonText>
+              </ButtonUpdate>
+              <ButtonDelete onPress={() => excludeSupplier()}>
+                <ButtonText>Excluir</ButtonText>
+              </ButtonDelete>
+            </ButtonBox>
+          </>
+        </SubPageBody>
+      )}
+    </>
   );
 }
 

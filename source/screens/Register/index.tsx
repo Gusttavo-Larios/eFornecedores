@@ -1,13 +1,11 @@
 import * as React from "react";
+import { useDispatch } from "react-redux";
 import { FormHandles, SubmitHandler } from "@unform/core";
 import { useNavigation } from "@react-navigation/native";
-import RNPickerSelect from "react-native-picker-select";
+import { zipCodeMask } from "~/functions/masks";
 import axios from "axios";
-import { useDispatch } from "react-redux";
 import { API_URL } from "@env";
-import acronyms_brazilian_states from "~/data/acronyms.brazilian.states";
-import RequestCitiesInterface from "~/interfaces/request.cities.interface";
-import ListCitiesInterface from "~/interfaces/list.citites.interface";
+import AddressInterface from "~/interfaces/address.interface";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import SubPageBody from "~/components/SubPageBody";
 import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
@@ -17,48 +15,46 @@ import { useResultAnimation } from "~/hooks/useResultAanimation";
 import {
   ButtonText,
   ConfirmationButton,
-  Headquarters,
-  HeadquartersColumn,
   InputText,
   Label,
   MaskedInput,
-  pickerSelectStyles,
+  RealTimeInput,
   UnForm,
 } from "./styles";
 
 function Register() {
-  const pickerStateOptions = acronyms_brazilian_states;
-
   const { animationStart } = useResultAnimation();
   const formRef = React.useRef<FormHandles>(null);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { reload } = useRefreshScreen();
 
-  const [citySelect, setCitySelect] = React.useState("");
-  const [stateSelect, setStateSelect] = React.useState("");
-  const [pickerCityOptions, setPickerCityOptions] = React.useState<
-    ListCitiesInterface[]
-  >([]);
+  const [initalFormData, setInitalFormData] = React.useState({});
+  const [zipCode, setZipCode] = React.useState("");
+  const [zipCodeIsInvalid, setZipCodeIsInvalid] = React.useState(false);
 
   React.useEffect(() => {
-    if (stateSelect !== "") searchCitites();
-  }, [stateSelect]);
+    if (zipCode.length === 8) searchAddressByZipCode();
+  }, [zipCode]);
 
-  async function searchCitites() {
+  async function searchAddressByZipCode() {
     try {
       const { data } = await axios.get(
-        `https://brasilapi.com.br/api/ibge/municipios/v1/${stateSelect}`
+        `https://viacep.com.br/ws/${zipCode}/json/`
       );
-      let list_cities: ListCitiesInterface[] = [];
-      data.map((element: RequestCitiesInterface, key: number) => {
-        list_cities.push({
-          key,
-          value: element.nome,
-          label: element.nome,
+
+      if (data.error === "true") {
+        setZipCodeIsInvalid(!zipCodeIsInvalid);
+      } else {
+        setZipCodeIsInvalid(!zipCodeIsInvalid);
+        const { bairro, localidade, uf, logradouro }: AddressInterface = data;
+        setInitalFormData({
+          state: uf,
+          city: localidade,
+          district: bairro,
+          street: logradouro,
         });
-      });
-      setPickerCityOptions(sortAlphabetically(list_cities));
+      }
     } catch (error) {
       animationStart(
         "error",
@@ -68,25 +64,16 @@ function Register() {
     }
   }
 
-  function sortAlphabetically(list: ListCitiesInterface[]) {
-    list.sort((a, b) => {
-      if (a.label < b.label) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-
-    return list;
-  }
-
   const registerSupplier: SubmitHandler<SupplierInterface> = async (data) => {
     try {
-      const supplier_data = { ...data, city: citySelect, state: stateSelect };
-      const form_is_valid = await supplier_schema.isValid({ ...supplier_data });
+      const supplier_form_data = { ...data, cep_number: zipCode };
+      const form_is_valid = await supplier_schema.isValid(supplier_form_data);
 
       if (form_is_valid) {
-        const response = await axios.post(`${API_URL}/register`, supplier_data);
+        const response = await axios.post(
+          `${API_URL}/register`,
+          supplier_form_data
+        );
 
         if (response.status === 200) {
           animationStart("success");
@@ -113,7 +100,11 @@ function Register() {
   return (
     <SubPageBody title="Cadastrar">
       <>
-        <UnForm ref={formRef} onSubmit={registerSupplier}>
+        <UnForm
+          ref={formRef}
+          initialData={initalFormData}
+          onSubmit={registerSupplier}
+        >
           <Label>Nome Social</Label>
           <InputText
             name="company_name"
@@ -137,46 +128,31 @@ function Register() {
             autoCorrect={false}
           />
 
-          <Headquarters>
-            <HeadquartersColumn>
-              <Label>Estado</Label>
-              <RNPickerSelect
-                placeholder={{ value: " ", label: " " }}
-                // placeholder={{}}
-                value={stateSelect === "" ? "" : stateSelect}
-                onValueChange={(district) => setStateSelect(district)}
-                items={pickerStateOptions}
-                style={pickerSelectStyles}
-                useNativeAndroidPickerStyle={false}
-              />
-            </HeadquartersColumn>
+          <Label>CEP</Label>
+          <RealTimeInput
+            value={zipCodeMask(zipCode)}
+            keyboardType="numeric"
+            maxLength={9}
+            error={zipCodeIsInvalid}
+            onChangeText={(text) =>
+              setZipCode(text.replace(/(-\d{3})\d+?$/, "$1").replace("-", ""))
+            }
+          />
 
-            <HeadquartersColumn>
-              <Label>Cidade</Label>
-              <RNPickerSelect
-                placeholder={{}}
-                value={citySelect}
-                onValueChange={(city) => setCitySelect(city)}
-                disabled={citySelect === "" ? true : false}
-                items={pickerCityOptions}
-                style={pickerSelectStyles}
-                useNativeAndroidPickerStyle={false}
-              />
-            </HeadquartersColumn>
-          </Headquarters>
+          <Label>Estado</Label>
+          <InputText
+            name="state"
+            autoCompleteType="off"
+            maxLength={2}
+            autoCorrect={false}
+          />
+
+          <Label>Cidade</Label>
+          <InputText name="city" autoCompleteType="off" autoCorrect={false} />
 
           <Label>Bairro</Label>
           <InputText
             name="district"
-            autoCompleteType="off"
-            autoCorrect={false}
-          />
-
-          <Label>CEP</Label>
-          <MaskedInput
-            name="cep_number"
-            type="zip-code"
-            keyboardType="numeric"
             autoCompleteType="off"
             autoCorrect={false}
           />

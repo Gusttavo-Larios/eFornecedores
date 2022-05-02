@@ -1,5 +1,4 @@
 import { Form } from "@unform/mobile";
-import { StyleSheet } from "react-native";
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -8,7 +7,6 @@ import {
 import styled from "styled-components/native";
 import Input from "~/components/Input";
 import InputMask from "~/components/InputMask";
-import { theme } from "~/theme";
 
 export const UnForm = styled(Form)`
   padding-bottom: ${responsiveHeight(20)}px;
@@ -45,45 +43,25 @@ export const MaskedInput = styled(InputMask)`
   font-size: ${responsiveFontSize(2)}px;
 `;
 
-export const Headquarters = styled.View`
+type RealTimeInputType = {
+  error?: boolean;
+};
+
+export const RealTimeInput = styled.TextInput<RealTimeInputType>`
   width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
+  height: ${responsiveHeight(7)}px;
+  margin-bottom: ${responsiveWidth(4)}px;
+  padding: 0 ${responsiveWidth(2)}px;
+  background-color: ${(props) => props.theme.COLORS.WHITE_200};
+  border-radius: ${responsiveFontSize(1)}px;
+  border: ${responsiveWidth(0.3)}px solid
+    ${(props) =>
+      props.error ? props.theme.COLORS.RED : props.theme.COLORS.BLACK};
+  font-family: ${(props) => props.theme.FONTS.REGULAR};
+  font-size: ${responsiveFontSize(2)}px;
+  color: ${(props) =>
+    props.error ? props.theme.COLORS.RED : props.theme.COLORS.BLACK};
 `;
-
-export const HeadquartersColumn = styled.View`
-  flex-direction: column;
-  width: 50%;
-`;
-
-export const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    width: "90%",
-    height: responsiveHeight(7),
-    backgroundColor: "#F2F2F2",
-    paddingHorizontal: responsiveWidth(1.5),
-    borderWidth: responsiveFontSize(0.15),
-    borderRadius: responsiveFontSize(1),
-    borderColor: theme.COLORS.BLACK,
-    fontSize: responsiveFontSize(2),
-    fontFamily: theme.FONTS.REGULAR,
-    color: theme.COLORS.BLACK,
-    textAlign: "center",
-  },
-  inputAndroid: {
-    width: "90%",
-    height: responsiveHeight(7),
-    backgroundColor: "#F2F2F2",
-    paddingHorizontal: responsiveWidth(1.5),
-    borderWidth: responsiveFontSize(0.15),
-    borderRadius: responsiveFontSize(1),
-    borderColor: theme.COLORS.BLACK,
-    fontSize: responsiveFontSize(2),
-    fontFamily: theme.FONTS.REGULAR,
-    color: theme.COLORS.BLACK,
-    textAlign: "center",
-  },
-});
 
 export const ConfirmationButton = styled.TouchableOpacity`
   width: 100%;

@@ -1,31 +1,27 @@
 import * as React from "react";
-import { FormHandles, SubmitHandler } from "@unform/core";
-import axios from "axios";
-import RNPickerSelect from "react-native-picker-select";
 import { useDispatch, useSelector } from "react-redux";
+import { FormHandles, SubmitHandler } from "@unform/core";
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
+import { API_URL } from "@env";
+import { zipCodeMask } from "~/functions/masks";
+import AddressInterface from "~/interfaces/address.interface";
 import SubPageBody from "~/components/SubPageBody";
-import acronyms_brazilian_states from "~/data/acronyms.brazilian.states";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
 import supplier_schema from "~/schema/supplier.schema";
-import ListCitiesInterface from "~/interfaces/list.citites.interface";
 import SupplierInterface from "~/interfaces/supplier.interface";
-import RequestCitiesInterface from "~/interfaces/request.cities.interface";
 import { RootState } from "~/redux";
 import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import {
   ButtonText,
   ConfirmationButton,
-  Headquarters,
-  HeadquartersColumn,
   InputText,
   Label,
   MaskedInput,
-  pickerSelectStyles,
+  RealTimeInput,
   UnForm,
 } from "./styles";
-import { API_URL } from "@env";
-import { useResultAnimation } from "~/hooks/useResultAanimation";
-import { useNavigation } from "@react-navigation/native";
-import useRefreshScreen from "~/hooks/useRefreshScreen";
 
 function Register() {
   const { animationStart } = useResultAnimation();
@@ -34,42 +30,47 @@ function Register() {
   const dispatch = useDispatch();
   const { reload } = useRefreshScreen();
 
-  const pickerStateOptions = acronyms_brazilian_states;
-
   const current_supplier_data = useSelector(
     (state: RootState) => state.supplierReducer
   );
 
-  const [citySelect, setCitySelect] = React.useState(
-    current_supplier_data.city
+  const [initalFormData, setInitalFormData] = React.useState(
+    current_supplier_data
   );
-  const [stateSelect, setStateSelect] = React.useState(
-    current_supplier_data.state
+  const [zipCode, setZipCode] = React.useState(
+    current_supplier_data.cep_number
   );
-  const [pickerCityOptions, setPickerCityOptions] = React.useState<
-    ListCitiesInterface[]
-  >([]);
+  const [zipCodeIsInvalid, setZipCodeIsInvalid] = React.useState(false);
 
   React.useEffect(() => {
-    searchCitites();
-  }, [stateSelect]);
+    if (zipCode.length === 8) searchAddressByZipCode();
+  }, [zipCode]);
 
-  async function searchCitites() {
+  async function searchAddressByZipCode() {
     try {
       const { data } = await axios.get(
-        `https://brasilapi.com.br/api/ibge/municipios/v1/${stateSelect}`
+        `https://viacep.com.br/ws/${zipCode}/json/`
       );
-      let list_cities: ListCitiesInterface[] = [];
-      data.map((element: RequestCitiesInterface, key: number) => {
-        list_cities.push({
-          key,
-          value: element.nome,
-          label: element.nome,
+
+      if (data.error === "true") {
+        setZipCodeIsInvalid(!zipCodeIsInvalid);
+      } else {
+        setZipCodeIsInvalid(!zipCodeIsInvalid);
+        const { bairro, localidade, uf, logradouro }: AddressInterface = data;
+        setInitalFormData({
+          ...initalFormData,
+          state: uf,
+          city: localidade,
+          district: bairro,
+          street: logradouro,
         });
-      });
-      setPickerCityOptions(sortAlphabetically(list_cities));
+      }
     } catch (error) {
-      console.log(error);
+      animationStart(
+        "error",
+        "Algum erro inesperado ocorreu, tente novamente mais tarde"
+      );
+      navigation.goBack();
     }
   }
 
@@ -77,9 +78,8 @@ function Register() {
     try {
       const { id } = current_supplier_data;
       const supplier_form_data = Object.assign(data, {
-        state: stateSelect,
-        city: citySelect,
         id,
+        cep_number: zipCode,
       }) as SupplierInterface;
 
       const form_is_valid = await supplier_schema.isValid({
@@ -106,28 +106,16 @@ function Register() {
     } catch (error) {
       animationStart(
         "error",
-        `Não foi possivel excluir ${current_supplier_data.company_name}`
+        `Não foi possivel atualizar o cadastro de ${current_supplier_data.company_name}`
       );
     }
   };
-
-  function sortAlphabetically(list: ListCitiesInterface[]) {
-    list.sort((a, b) => {
-      if (a.label < b.label) {
-        return -1;
-      } else {
-        return 1;
-      }
-    });
-
-    return list;
-  }
 
   return (
     <SubPageBody title="Atualizar">
       <>
         <UnForm
-          initialData={current_supplier_data}
+          initialData={initalFormData}
           ref={formRef}
           onSubmit={updateSupplier}
         >
@@ -154,45 +142,29 @@ function Register() {
             autoCorrect={false}
           />
 
-          <Headquarters>
-            <HeadquartersColumn>
-              <Label>Estado</Label>
-              <RNPickerSelect
-                placeholder={{ value: "", label: "Selecione" }}
-                value={stateSelect}
-                onValueChange={(district) => setStateSelect(district)}
-                items={pickerStateOptions}
-                style={pickerSelectStyles}
-                useNativeAndroidPickerStyle={false}
-              />
-            </HeadquartersColumn>
+          <Label>CEP</Label>
+          <RealTimeInput
+            value={zipCodeMask(zipCode)}
+            keyboardType="numeric"
+            error={zipCodeIsInvalid}
+            maxLength={9}
+            onChangeText={(text) => setZipCode(text.replace("-", ""))}
+          />
 
-            <HeadquartersColumn>
-              <Label>Cidade</Label>
-              <RNPickerSelect
-                placeholder={{ value: "", label: "Selecione" }}
-                value={citySelect}
-                onValueChange={(city) => setCitySelect(city)}
-                disabled={citySelect === "" ? true : false}
-                items={pickerCityOptions}
-                style={pickerSelectStyles}
-                useNativeAndroidPickerStyle={false}
-              />
-            </HeadquartersColumn>
-          </Headquarters>
+          <Label>Estado</Label>
+          <InputText
+            name="state"
+            autoCompleteType="off"
+            maxLength={2}
+            autoCorrect={false}
+          />
+
+          <Label>Cidade</Label>
+          <InputText name="city" autoCompleteType="off" autoCorrect={false} />
 
           <Label>Bairro</Label>
           <InputText
             name="district"
-            autoCompleteType="off"
-            autoCorrect={false}
-          />
-
-          <Label>CEP</Label>
-          <MaskedInput
-            name="cep_number"
-            type="zip-code"
-            keyboardType="numeric"
             autoCompleteType="off"
             autoCorrect={false}
           />

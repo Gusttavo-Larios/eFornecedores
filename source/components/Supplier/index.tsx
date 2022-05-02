@@ -1,9 +1,12 @@
 import * as React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import { setSupplierReference } from "~/redux/reducers/supplier.slice";
 import { CnpjNumber, CompanyName, Container } from "./styles";
+import { cnpjMask } from "~/functions/masks";
+import { RootState } from "~/redux";
+import { useLoading } from "~/hooks/useLoading";
 
 type ProviderType = {
   provider: SupplierInterface;
@@ -12,23 +15,20 @@ type ProviderType = {
 function Supplier({ provider }: ProviderType) {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { startLoading } = useLoading();
 
   let { cnpj_number, company_name } = provider;
 
   function navigator(screen: string) {
     dispatch(setSupplierReference({ cnpj_number }));
+    startLoading();
     navigation.navigate(screen as never);
   }
 
   return (
     <Container activeOpacity={0.5} onPress={() => navigator("Details")}>
       <CompanyName>{company_name}</CompanyName>
-      <CnpjNumber>
-        {cnpj_number.replace(
-          /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g,
-          "$1.$2.$3/$4-$5"
-        )}
-      </CnpjNumber>
+      <CnpjNumber>{cnpjMask(cnpj_number)}</CnpjNumber>
     </Container>
   );
 }
