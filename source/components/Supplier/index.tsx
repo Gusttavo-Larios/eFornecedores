@@ -1,11 +1,10 @@
 import * as React from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import { setSupplierReference } from "~/redux/reducers/supplier.slice";
 import { CnpjNumber, CompanyName, Container } from "./styles";
 import { cnpjMask } from "~/functions/masks";
-import { RootState } from "~/redux";
 import { useLoading } from "~/hooks/useLoading";
 
 type ProviderType = {

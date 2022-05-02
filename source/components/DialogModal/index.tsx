@@ -1,26 +1,22 @@
 import * as React from "react";
 import Modal from "react-native-modal";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
+import useDialogModal from "~/hooks/useDialogModal";
 import { RootState } from "~/redux";
-import { closeDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import { ButtonText, Button, Container, Message, Overlap } from "./styles";
 
 function DialogModal() {
+  const { closeDialogModal } = useDialogModal();
   const { modalIsVisible, message } = useSelector(
     (state: RootState) => state.modalDialogReducer
   );
-  const dispatch = useDispatch();
-
-  function closeDialoggdal() {
-    dispatch(closeDialogModal());
-  }
 
   return (
     <Modal isVisible={modalIsVisible}>
       <Overlap>
         <Container>
           <Message>{message}</Message>
-          <Button activeOpacity={0.8} onPress={() => closeDialoggdal()}>
+          <Button activeOpacity={0.8} onPress={() => closeDialogModal()}>
             <ButtonText>Ok</ButtonText>
           </Button>
         </Container>

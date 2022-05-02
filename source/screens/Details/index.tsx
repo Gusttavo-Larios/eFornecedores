@@ -47,7 +47,7 @@ function Details() {
       const response = await axios.get(
         `${API_URL}/search-supplier?cnpj_number=${cnpj_number}`
       );
-      const supplier: SupplierInterface = response.data.supplier[0];
+      const supplier: SupplierInterface = response.data.supplier;
       setCurrentSupplierData(supplier);
       finishLoading();
     } catch (error) {

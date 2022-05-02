@@ -7,12 +7,13 @@ import { API_URL } from "@env";
 import { zipCodeMask } from "~/functions/masks";
 import AddressInterface from "~/interfaces/address.interface";
 import SubPageBody from "~/components/SubPageBody";
-import { useResultAnimation } from "~/hooks/useResultAanimation";
-import useRefreshScreen from "~/hooks/useRefreshScreen";
 import supplier_schema from "~/schema/supplier.schema";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import { RootState } from "~/redux";
-import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
+import { clearSupplierData } from "~/redux/reducers/supplier.slice";
+import useDialogModal from "~/hooks/useDialogModal";
+import useRefreshScreen from "~/hooks/useRefreshScreen";
+import { useResultAnimation } from "~/hooks/useResultAanimation";
 import {
   ButtonText,
   ConfirmationButton,
@@ -29,6 +30,7 @@ function Register() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { reload } = useRefreshScreen();
+  const { openDialogModal } = useDialogModal();
 
   const current_supplier_data = useSelector(
     (state: RootState) => state.supplierReducer
@@ -52,7 +54,7 @@ function Register() {
         `https://viacep.com.br/ws/${zipCode}/json/`
       );
 
-      if (data.error === "true") {
+      if (data.erro === "true") {
         setZipCodeIsInvalid(!zipCodeIsInvalid);
       } else {
         setZipCodeIsInvalid(!zipCodeIsInvalid);
@@ -75,39 +77,37 @@ function Register() {
   }
 
   const updateSupplier: SubmitHandler<SupplierInterface> = async (data) => {
-    try {
-      const { id } = current_supplier_data;
-      const supplier_form_data = Object.assign(data, {
-        id,
-        cep_number: zipCode,
-      }) as SupplierInterface;
+    const { id } = current_supplier_data;
+    const supplier_form_data = Object.assign(data, {
+      id,
+      cep_number: zipCode,
+    }) as SupplierInterface;
 
-      const form_is_valid = await supplier_schema.isValid({
-        ...supplier_form_data,
-      });
+    const form_is_valid = await supplier_schema.isValid({
+      ...supplier_form_data,
+    });
 
-      if (form_is_valid) {
-        const respose = await axios.put(
-          `${API_URL}/update`,
-          supplier_form_data
-        );
-        if (respose.status === 200) {
+    if (form_is_valid && !zipCodeIsInvalid) {
+      await axios
+        .put(`${API_URL}/update`, supplier_form_data)
+        .then(() => {
           animationStart("success");
           reload();
           navigation.navigate("Home" as never);
-        }
-      } else {
-        dispatch(
-          openDialogModal({
-            message: "Preencha todos os campos corretamente",
-          })
-        );
-      }
-    } catch (error) {
-      animationStart(
-        "error",
-        `Não foi possivel atualizar o cadastro de ${current_supplier_data.company_name}`
-      );
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            animationStart("error", error.response.data.message);
+            return;
+          }
+          animationStart(
+            "error",
+            `Não foi possivel atualizar o cadastro de ${current_supplier_data.company_name}`
+          );
+        });
+    } else {
+      openDialogModal("Preencha todos os campos corretamente");
+      dispatch(clearSupplierData());
     }
   };
 

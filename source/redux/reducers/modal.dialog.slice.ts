@@ -7,17 +7,17 @@ const modalSlice = createSlice({
     message: "",
   },
   reducers: {
-    openDialogModal(currentState, { payload }) {
+    setDialogModal(currentState, { payload }) {
       const { message } = payload;
       currentState.modalIsVisible = true;
       currentState.message = message;
     },
-    closeDialogModal(currentState) {
+    clearDialogModal(currentState) {
       currentState.modalIsVisible = false;
       currentState.message = "";
     },
   },
 });
 
-export const { closeDialogModal, openDialogModal } = modalSlice.actions;
+export const { clearDialogModal, setDialogModal } = modalSlice.actions;
 export default modalSlice.reducer;

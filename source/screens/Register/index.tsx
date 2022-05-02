@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useDispatch } from "react-redux";
 import { FormHandles, SubmitHandler } from "@unform/core";
 import { useNavigation } from "@react-navigation/native";
 import { zipCodeMask } from "~/functions/masks";
@@ -8,10 +7,10 @@ import { API_URL } from "@env";
 import AddressInterface from "~/interfaces/address.interface";
 import SupplierInterface from "~/interfaces/supplier.interface";
 import SubPageBody from "~/components/SubPageBody";
-import { openDialogModal } from "~/redux/reducers/modal.dialog.slice";
 import supplier_schema from "~/schema/supplier.schema";
 import useRefreshScreen from "~/hooks/useRefreshScreen";
 import { useResultAnimation } from "~/hooks/useResultAanimation";
+import useDialogModal from "~/hooks/useDialogModal";
 import {
   ButtonText,
   ConfirmationButton,
@@ -23,11 +22,11 @@ import {
 } from "./styles";
 
 function Register() {
-  const { animationStart } = useResultAnimation();
   const formRef = React.useRef<FormHandles>(null);
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const { reload } = useRefreshScreen();
+  const { openDialogModal } = useDialogModal();
+  const { animationStart } = useResultAnimation();
 
   const [initalFormData, setInitalFormData] = React.useState({});
   const [zipCode, setZipCode] = React.useState("");
@@ -43,7 +42,7 @@ function Register() {
         `https://viacep.com.br/ws/${zipCode}/json/`
       );
 
-      if (data.error === "true") {
+      if (data.erro === "true") {
         setZipCodeIsInvalid(!zipCodeIsInvalid);
       } else {
         setZipCodeIsInvalid(!zipCodeIsInvalid);
@@ -65,34 +64,30 @@ function Register() {
   }
 
   const registerSupplier: SubmitHandler<SupplierInterface> = async (data) => {
-    try {
-      const supplier_form_data = { ...data, cep_number: zipCode };
-      const form_is_valid = await supplier_schema.isValid(supplier_form_data);
+    const supplier_form_data = { ...data, cep_number: zipCode };
+    const form_is_valid = await supplier_schema.isValid(supplier_form_data);
 
-      if (form_is_valid) {
-        const response = await axios.post(
-          `${API_URL}/register`,
-          supplier_form_data
-        );
-
-        if (response.status === 200) {
+    if (form_is_valid && !zipCodeIsInvalid) {
+      await axios
+        .post(`${API_URL}/register`, supplier_form_data)
+        .then(() => {
           animationStart("success");
           reload();
           navigation.goBack();
-        }
-      } else {
-        dispatch(
-          openDialogModal({
-            message:
-              "Preencha todos os campos corretamente para cadastrar um novo fornencedor",
-            isDialog: false,
-          })
-        );
-      }
-    } catch (error) {
-      animationStart(
-        "error",
-        "Não foi possivel realizar o cadastro do fornecedor"
+        })
+        .catch((error) => {
+          if (error.response.status === 400) {
+            animationStart("error", error.response.data.message);
+            return;
+          }
+          animationStart(
+            "error",
+            "Não foi possivel realizar o cadastro do fornecedor"
+          );
+        });
+    } else {
+      openDialogModal(
+        "Preencha todos os campos corretamente para cadastrar um novo fornencedor"
       );
     }
   };
