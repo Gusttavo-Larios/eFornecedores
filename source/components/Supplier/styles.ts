@@ -1,3 +1,4 @@
+import { MotiView } from "moti";
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -5,7 +6,9 @@ import {
 } from "react-native-responsive-dimensions";
 import styled from "styled-components/native";
 
-export const Container = styled.TouchableOpacity`
+export const Container = styled(MotiView)``;
+
+export const Button = styled.TouchableOpacity`
   width: ${responsiveWidth(85)}px;
   height: ${responsiveHeight(13)}px;
   border-radius: ${responsiveFontSize(1)}px;
